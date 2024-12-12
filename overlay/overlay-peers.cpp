@@ -252,6 +252,7 @@ void OverlayImpl::on_ping_result(adnl::AdnlNodeIdShort peer, bool success) {
     return;
   }
   if (OverlayPeer *p = peer_list_.peers_.get(peer)) {
+    VLOG(OVERLAY_DEBUG) << this << ": node ping " << peer << success;
     p->on_ping_result(success);
     if (p->is_alive()) {
       peer_list_.bad_peers_.erase(peer);
