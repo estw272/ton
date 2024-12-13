@@ -85,7 +85,7 @@ void OverlayImpl::del_some_peers() {
     OverlayPeer *P;
     if (peer_list_.bad_peers_.empty()) {
       P = get_random_peer();
-      VLOG(OVERLAY_DEBUG) << this << ": got random peer to delete " << P;
+      VLOG(OVERLAY_DEBUG) << this << ": got random peer to delete " << P << peer_list_.peers.size() << max_peers();
     } else {
       auto it = peer_list_.bad_peers_.upper_bound(peer_list_.next_bad_peer_);
       if (it == peer_list_.bad_peers_.end()) {
@@ -178,7 +178,7 @@ void OverlayImpl::add_peer(OverlayNode node) {
   }
   auto t = td::Clocks::system();
   if (node.version() + Overlays::overlay_peer_ttl() < t || node.version() > t + 60) {
-    VLOG(OVERLAY_INFO) << this << ": ignoring node of too old version " << node.version();
+    VLOG(OVERLAY_INFO) << this << ": ignoring node of too old version " << node.version() << node.adnl_id_short();
     return;
   }
 
@@ -190,7 +190,7 @@ void OverlayImpl::add_peer(OverlayNode node) {
 
   auto S = node.check_signature();
   if (S.is_error()) {
-    VLOG(OVERLAY_WARNING) << this << ": bad signature: " << S;
+    VLOG(OVERLAY_WARNING) << this << ": bad signature: " << S << node.adnl_id_short();
     return;
   }
 
@@ -433,6 +433,7 @@ void OverlayImpl::update_neighbours(td::uint32 nodes_to_change) {
 
     if (X->get_node()->flags() & OverlayMemberFlags::DoNotReceiveBroadcasts) {
       if (X->is_neighbour()) {
+        VLOG(OVERLAY_DEBUG) << this << ": deleting donotreceive peer in update_neighbours " << X->get_id();
         del_from_neighbour_list(X);
       }
       continue;
