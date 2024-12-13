@@ -85,15 +85,18 @@ void OverlayImpl::del_some_peers() {
     OverlayPeer *P;
     if (peer_list_.bad_peers_.empty()) {
       P = get_random_peer();
+      VLOG(OVERLAY_DEBUG) << this << ": got random peer to delete " << P;
     } else {
       auto it = peer_list_.bad_peers_.upper_bound(peer_list_.next_bad_peer_);
       if (it == peer_list_.bad_peers_.end()) {
         it = peer_list_.bad_peers_.begin();
       }
       P = peer_list_.peers_.get(peer_list_.next_bad_peer_ = *it);
+      VLOG(OVERLAY_DEBUG) << this << ": got bad peer to delete " << P;
     }
     if (P && !P->is_permanent_member()) {
       auto id = P->get_id();
+      VLOG(OVERLAY_DEBUG) << this << ": deleting selected peer " << id;
       del_peer(id);
     }
   }
@@ -414,6 +417,7 @@ void OverlayImpl::update_neighbours(td::uint32 nodes_to_change) {
         del_from_neighbour_list(X);
       } else {
         auto id = X->get_id();
+        VLOG(OVERLAY_DEBUG) << this << ": deleting old peer in update_neighbours " << id;
         del_peer(id);
       }
       continue;
@@ -422,6 +426,7 @@ void OverlayImpl::update_neighbours(td::uint32 nodes_to_change) {
     if (overlay_type_ == OverlayType::CertificatedMembers && !X->is_permanent_member() &&
         X->certificate()->is_expired()) {
       auto id = X->get_id();
+      VLOG(OVERLAY_DEBUG) << this << ": deleting cert peer in update_neighbours " << id;
       del_peer(id);
       continue;
     }

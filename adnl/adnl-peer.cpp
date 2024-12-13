@@ -156,7 +156,7 @@ void AdnlPeerPairImpl::receive_packet_checked(AdnlPacket packet) {
   }
   if (packet.seqno() > 0) {
     if (received_packet(packet.seqno())) {
-      VLOG(ADNL_INFO) << this << ": dropping IN message: old seqno: " << packet.seqno() << " (current max " << in_seqno_
+      VLOG(ADNL_INFO) << this << ": dropping IN message: old seqno: " << packet.seqno() << packet.confirm_seqno() << " (current max " << in_seqno_
                       << ")";
       return;
     }
