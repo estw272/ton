@@ -173,7 +173,7 @@ td::Status OverlayImpl::validate_peer_certificate(const adnl::AdnlNodeIdShort &n
 void OverlayImpl::add_peer(OverlayNode node) {
   CHECK(overlay_type_ != OverlayType::FixedMemberList);
   if (node.overlay_id() != overlay_id_) {
-    VLOG(OVERLAY_WARNING) << this << ": received node with bad overlay";
+    VLOG(OVERLAY_WARNING) << this << ": received node with bad overlay" << node.adnl_id_short();
     return;
   }
   auto t = td::Clocks::system();
@@ -414,6 +414,7 @@ void OverlayImpl::update_neighbours(td::uint32 nodes_to_change) {
     if (overlay_type_ != OverlayType::FixedMemberList && X->get_version() <= td::Clocks::system() -
         Overlays::overlay_peer_ttl()) {
       if (X->is_permanent_member()) {
+        VLOG(OVERLAY_DEBUG) << this << ": deleting old permanent member " << X->get_id();
         del_from_neighbour_list(X);
       } else {
         auto id = X->get_id();
@@ -454,6 +455,7 @@ void OverlayImpl::update_neighbours(td::uint32 nodes_to_change) {
       CHECK(Y != nullptr);
       CHECK(Y->is_neighbour());
       Y->set_neighbour(false);
+      VLOG(OVERLAY_DEBUG) << this << ": removing random neighbour " << Y->get_id() << " " << peer_list_.neighbours_.size();
       peer_list_.neighbours_[i] = X->get_id();
       X->set_neighbour(true);
       nodes_to_change--;
