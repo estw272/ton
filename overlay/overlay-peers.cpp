@@ -85,7 +85,7 @@ void OverlayImpl::del_some_peers() {
     OverlayPeer *P;
     if (peer_list_.bad_peers_.empty()) {
       P = get_random_peer();
-      VLOG(OVERLAY_DEBUG) << this << ": got random peer to delete " << P << peer_list_.peers_.size() << max_peers();
+      VLOG(OVERLAY_DEBUG) << this << ": got random peer to delete " << P << " " << peer_list_.peers_.size() << " " << max_peers();
     } else {
       auto it = peer_list_.bad_peers_.upper_bound(peer_list_.next_bad_peer_);
       if (it == peer_list_.bad_peers_.end()) {
